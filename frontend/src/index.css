@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    background-color: #0f1117;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #161b27;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #252d40;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6366f1;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface-1 border border-white/5 rounded-xl backdrop-blur-sm;
+  }
+  
+  .glass-card-hover {
+    @apply glass-card transition-all duration-200 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5;
+  }
+  
+  .accent-btn {
+    @apply bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent-light transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .ghost-btn {
+    @apply bg-surface-2 text-slate-300 border border-white/5 px-4 py-2 rounded-lg text-sm font-medium hover:border-accent/30 hover:text-white transition-all duration-150;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-strong {
+    @apply badge bg-emerald-accent/15 text-emerald-400;
+  }
+  
+  .badge-medium {
+    @apply badge bg-amber-accent/15 text-amber-400;
+  }
+  
+  .badge-weak {
+    @apply badge bg-rose-accent/15 text-rose-400;
+  }
+  
+  .section-title {
+    @apply font-display text-lg font-semibold text-white;
+  }
+  
+  .label {
+    @apply text-xs font-medium text-slate-400 uppercase tracking-wider;
+  }
+}
+
+/* Grid background */
+.bg-grid {
+  background-image: 
+    linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+}
+
+.glow-teal {
+  box-shadow: 0 0 20px rgba(45, 212, 191, 0.1);
+}
+
+/* Confidence bar */
+.conf-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #6366f1, #2dd4bf);
+}
+
+/* Animated gradient */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #1e2535 25%, #252d40 50%, #1e2535 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Pulse ring */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #6366f1;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
