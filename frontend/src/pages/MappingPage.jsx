@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Play, Loader2, CheckCircle2, AlertCircle, Download, Search, Filter, ChevronDown, ChevronRight, Info } from 'lucide-react'
 import { runMapping, getMappingStatus, getMappingResults, downloadExcel, downloadCSV, downloadJSON, getUploadStatus } from '../services/api'
 
 export default function MappingPage() {
+  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [tierFilter, setTierFilter] = useState('all')
   const [expandedApp, setExpandedApp] = useState(null)
-  const pollRef = useRef(null)
 
   const { data: uploadStatus } = useQuery({
     queryKey: ['upload-status'],
@@ -18,7 +18,6 @@ export default function MappingPage() {
   const { data: mappingStatus, refetch: refetchStatus } = useQuery({
     queryKey: ['mapping-status'],
     queryFn: () => getMappingStatus().then(r => r.data),
-    refetchInterval: 2000,
   })
 
   const { data: results, refetch: refetchResults } = useQuery({
@@ -27,14 +26,30 @@ export default function MappingPage() {
     enabled: mappingStatus?.status === 'done',
   })
 
-  const runMutation = useMutation({
-    mutationFn: () => runMapping(),
-    onSuccess: () => refetchStatus(),
-  })
-
   const isRunning = mappingStatus?.status === 'running'
   const isDone = mappingStatus?.status === 'done'
   const isError = mappingStatus?.status === 'error'
+
+  // Explicit polling while running — avoids refetchInterval quirks with staleTime
+  useEffect(() => {
+    if (!isRunning) return
+    const timer = setInterval(() => refetchStatus(), 2000)
+    return () => clearInterval(timer)
+  }, [isRunning, refetchStatus])
+
+  const runMutation = useMutation({
+    mutationFn: () => runMapping(),
+    onMutate: () => {
+      queryClient.removeQueries({ queryKey: ['mapping-results'] })
+      queryClient.removeQueries({ queryKey: ['tree-results'] })
+      queryClient.removeQueries({ queryKey: ['summary'] })
+      queryClient.removeQueries({ queryKey: ['heatmap'] })
+      queryClient.removeQueries({ queryKey: ['unmapped'] })
+      queryClient.removeQueries({ queryKey: ['conf-dist'] })
+    },
+    onSuccess: () => refetchStatus(),
+  })
+
 
   const progress = mappingStatus?.total
     ? Math.round((mappingStatus.progress / mappingStatus.total) * 100)
@@ -50,7 +65,7 @@ export default function MappingPage() {
     return matchSearch && matchTier
   })
 
-  const canRun = uploadStatus?.capabilities_loaded && uploadStatus?.cmdb_loaded && !isRunning
+  const canRun = uploadStatus?.capabilities_loaded && uploadStatus?.cmdb_loaded && !isRunning && !runMutation.isPending
 
   return (
     <div className="p-8 max-w-6xl mx-auto">

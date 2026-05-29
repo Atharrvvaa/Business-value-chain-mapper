@@ -28,7 +28,7 @@ except ImportError:
 
 OLLAMA_MODEL = "qwen3.5:4b"
 MAX_RETRIES = 1
-TOP_CAPS = 15  # pre-filter: only send the N most relevant capabilities
+TOP_CAPS = 8  # pre-filter: only send the N most relevant capabilities
 
 
 class AIMapper:
@@ -135,8 +135,7 @@ class AIMapper:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},
                 ],
-                format="json",
-                options={"temperature": 0.1, "num_predict": 600},
+                options={"temperature": 0.0, "num_predict": 300},
             )
             return response.message.content
 

@@ -43,6 +43,10 @@ export const getHeatmap = () => api.get('/analytics/heatmap')
 export const getUnmapped = () => api.get('/analytics/unmapped')
 export const getConfidenceDistribution = () => api.get('/analytics/confidence-distribution')
 
+export const getCostConcentration = () => api.get('/analytics/cost-concentration')
+export const runRedundancyAnalysis = () => api.post('/analytics/redundancy')
+export const getRedundancyStatus = () => api.get('/analytics/redundancy/status')
+
 // ── Export ───────────────────────────────────────────────────────────────────
 
 export const downloadExcel = () => window.open('/api/export/excel', '_blank')

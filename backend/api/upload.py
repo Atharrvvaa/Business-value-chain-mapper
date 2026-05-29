@@ -102,9 +102,13 @@ async def upload_cmdb(file: UploadFile = File(...)):
                 else:
                     raise HTTPException(400, f"Missing required column: '{col}'. Found: {list(df.columns)}")
 
-        # Apply str conversion
+        # Preserve numeric cost columns; stringify everything else
+        _numeric_cols = {"license_cost_annual", "maintenance_cost_annual", "total_annual_cost"}
         for col in df.columns:
-            df[col] = df[col].apply(safe_str)
+            if col in _numeric_cols:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+            else:
+                df[col] = df[col].apply(safe_str)
 
         df = df[df["application_name"] != ""].drop_duplicates(subset=["application_name"])
         app_state.set_cmdb(df)

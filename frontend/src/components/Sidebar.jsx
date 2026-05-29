@@ -1,20 +1,18 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { 
-  Upload, Network, BarChart3, GitBranch, Cpu, Layers
-} from 'lucide-react'
+import { Upload, BarChart3, GitBranch, Cpu, Layers, DollarSign } from 'lucide-react'
 
 const NAV = [
   { id: 'upload', label: 'Upload Data', icon: Upload },
   { id: 'mapping', label: 'Run Mapping', icon: Cpu },
   { id: 'tree', label: 'Capability Tree', icon: GitBranch },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'costs', label: 'Cost Analysis', icon: DollarSign },
 ]
 
 export default function Sidebar({ currentPage, onNavigate }) {
   return (
     <aside className="w-56 flex-shrink-0 flex flex-col bg-surface-1 border-r border-white/5">
-      {/* Logo */}
       <div className="p-5 border-b border-white/5">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent to-teal-accent flex items-center justify-center">
@@ -27,16 +25,11 @@ export default function Sidebar({ currentPage, onNavigate }) {
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 p-3 space-y-0.5">
         {NAV.map(({ id, label, icon: Icon }) => {
           const active = currentPage === id
           return (
-            <button
-              key={id}
-              onClick={() => onNavigate(id)}
-              className="w-full text-left"
-            >
+            <button key={id} onClick={() => onNavigate(id)} className="w-full text-left">
               <div className={`
                 relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
                 transition-all duration-150 group
@@ -59,9 +52,8 @@ export default function Sidebar({ currentPage, onNavigate }) {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-white/5">
-        <p className="text-slate-600 text-[10px] font-mono">v2.0.0 • Qwen2.5</p>
+      <div className="p-3 border-t border-white/5">
+        <p className="text-slate-600 text-[10px] font-mono px-1">v2.0.0 · Qwen3.5</p>
       </div>
     </aside>
   )

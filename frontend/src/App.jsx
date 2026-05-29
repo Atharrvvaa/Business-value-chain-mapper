@@ -5,12 +5,14 @@ import UploadPage from './pages/UploadPage'
 import MappingPage from './pages/MappingPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import CapabilityTreePage from './pages/CapabilityTreePage'
+import CostAnalysisPage from './pages/CostAnalysisPage'
 
 const PAGES = {
   upload: UploadPage,
   mapping: MappingPage,
   analytics: AnalyticsPage,
   tree: CapabilityTreePage,
+  costs: CostAnalysisPage,
 }
 
 export default function App() {

@@ -25,6 +25,7 @@ async def run_mapping(background_tasks: BackgroundTasks, request: Request):
 
     app_state.mapping_status = "running"
     app_state.mapping_progress = 0
+    app_state.mapping_total = len(app_state.cmdb_df)
     app_state.error_message = None
 
     reference_loader = request.app.state.reference_loader

@@ -22,4 +22,6 @@ Capabilities to choose from:
 {caps_str}
 
 Pick 1-3 best matches. Return ONLY this JSON (no other text):
-{{"application_name":"{application_name}","mapped_capabilities":[{{"capability":"<name>","confidence":<0.0-1.0>,"reasoning":"<10 words max>"}}]}}"""
+{{"application_name":"{application_name}","mapped_capabilities":[{{"capability":"<name>","confidence":<0.0-1.0>,"reasoning":"<10 words max>"}}]}}
+
+/no_think"""

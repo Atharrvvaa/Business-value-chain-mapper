@@ -26,6 +26,9 @@ class AppState:
         self.mapping_total: int = 0
         self.error_message: Optional[str] = None
         self.metadata: Dict[str, Any] = {}
+        self.redundancy_status: str = "idle"  # idle | running | done | error
+        self.redundancy_results: Optional[list] = None
+        self.redundancy_error: Optional[str] = None
 
     def reset(self):
         self._init()

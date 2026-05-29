@@ -9,11 +9,13 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from rapidfuzz import fuzz
+
 from services.enrichment.enrichment_service import EnrichmentService
 from services.enrichment.reference_loader import ReferenceLoader
 from services.mapping.ai_mapper import AIMapper
 from utils.state import app_state
-from utils.text_utils import safe_str
+from utils.text_utils import safe_str, clean_text
 
 logger = logging.getLogger(__name__)
 
@@ -89,8 +91,12 @@ class MappingOrchestrator:
         enriched = await asyncio.to_thread(self.enrichment_svc.enrich_application, app)
         logger.info(f"[ENRICH] {app_name} → tier={enriched['match_tier']} ref={enriched['reference_app']}")
 
-        # Step 2: AI Map
-        ai_result = await self.ai_mapper.map_application(enriched, capabilities)
+        # Step 2: Map — fast-path for strong reference matches, AI for everything else
+        if enriched.get("match_tier") == "strong" and enriched.get("typical_capabilities"):
+            logger.info(f"[FAST] {app_name}: strong ref match, skipping AI")
+            ai_result = self._fast_map_from_reference(enriched, capabilities)
+        else:
+            ai_result = await self.ai_mapper.map_application(enriched, capabilities)
 
         # Step 3: Attach value chains
         mapped_caps = []
@@ -112,6 +118,36 @@ class MappingOrchestrator:
             "business_use_cases": enriched["business_use_cases"],
             "mapped_capabilities": mapped_caps,
             "is_mapped": len(mapped_caps) > 0,
+        }
+
+    def _fast_map_from_reference(
+        self,
+        enriched: Dict[str, Any],
+        capabilities: List[str],
+    ) -> Dict[str, Any]:
+        """Keyword-match capabilities against reference data — no LLM needed."""
+        typical = clean_text(enriched.get("typical_capabilities", ""))
+        business = clean_text(enriched.get("business_use_cases", ""))
+        ref_text = f"{typical} {business}"
+        match_score = enriched.get("match_score", 0.80)
+
+        scored = [
+            (cap, fuzz.token_set_ratio(ref_text, clean_text(cap)) / 100.0)
+            for cap in capabilities
+        ]
+        scored.sort(key=lambda x: x[1], reverse=True)
+        top = [(cap, s) for cap, s in scored[:3] if s > 0.25]
+
+        return {
+            "application_name": enriched["application_name"],
+            "mapped_capabilities": [
+                {
+                    "capability": cap,
+                    "confidence": round(min(s * (match_score / 0.80), 0.92), 3),
+                    "reasoning": "Reference database match.",
+                }
+                for cap, s in top
+            ],
         }
 
     def _build_capability_map(self, cap_df: pd.DataFrame) -> Dict[str, str]:
